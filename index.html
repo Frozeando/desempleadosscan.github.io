@@ -456,8 +456,8 @@ const BOOKS = {
     cover: 'data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZ...',
     desc: 'Zephyr Hunt fue traicionado y arrojado al abismo. Ahora regresa con el poder de los dioses para destruir a quienes lo enviaron a morir.',
     tags: ['Manhwa','Acción','Regresión','Venganza'],
-    status: 'Nuevo',
-    caps: []
+    status: 'En Curso',
+    caps: [{n:1,title:'Capitulo 1',date:'2026'}]
   }
 };
 
@@ -542,16 +542,35 @@ function loadReaderCap(idx) {
   const pages = document.getElementById('reader-pages');
   const cap = b.caps[idx];
   if(!cap) return;
-  // Intentar cargar desde GitHub, si no hay → placeholder
-  const base = `caps/${readerManga}/cap-${String(cap.n).padStart(3,'0')}/`;
   pages.innerHTML = '';
-  // Mostrar 8 páginas placeholder con instrucción
-  for(let p=1;p<=8;p++) {
-    const div = document.createElement('div');
-    div.className = 'rpage rpage-ph';
-    div.innerHTML = `<div class="pgn">${String(p).padStart(2,'0')}</div>
-      <p>Página ${p} — Subí las imágenes a:<br><code style="color:var(--gold);font-size:11px">${base}${String(p).padStart(2,'0')}.jpg</code></p>`;
-    pages.appendChild(div);
+
+  function getImgPath(manga, capN, p) {
+    if(manga === 'db') {
+      return p === 1 ? 'caps/DB/DB/1 (1).jpg' : 'caps/DB/DB/1 (' + p + ').jpg';
+    }
+    var padCap = String(capN).padStart(3,'0');
+    var padP = String(p).padStart(2,'0');
+    return 'caps/' + manga + '/cap-' + padCap + '/' + padP + '.jpg';
+  }
+
+  var totalPages = (readerManga === 'db') ? 100 : 8;
+
+  for(var p = 1; p <= totalPages; p++) {
+    (function(pageNum) {
+      var wrapper = document.createElement('div');
+      wrapper.className = 'rpage';
+      var img = document.createElement('img');
+      img.src = getImgPath(readerManga, cap.n, pageNum);
+      img.alt = 'Pagina ' + pageNum;
+      img.loading = 'lazy';
+      img.style.width = '100%';
+      img.style.display = 'block';
+      img.onerror = function() {
+        wrapper.innerHTML = '<div class="rpage-ph"><div class="pgn">' + String(pageNum).padStart(2,'0') + '</div><p>Pagina ' + pageNum + ' no disponible</p></div>';
+      };
+      wrapper.appendChild(img);
+      pages.appendChild(wrapper);
+    })(p);
   }
   window.scrollTo(0,0);
 }
