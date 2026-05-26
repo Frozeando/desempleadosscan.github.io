@@ -551,17 +551,21 @@ function loadReaderCap(idx) {
   if(!cap) return;
   pages.innerHTML = '';
 
+  var BASE = '';
+  // Detectar si estamos en subruta de GitHub Pages
+  var loc = window.location.pathname;
+  if(loc.indexOf('/desempleadosscan.github.io') !== -1) {
+    BASE = '/desempleadosscan.github.io';
+  }
+
   function getImgPath(manga, capN, p) {
+    var n3 = String(p).padStart(3,'0');
     if(manga === 'db') {
-      // Nombres: 001.jpg 002.jpg ... intentar ambos formatos
-      var n3 = String(p).padStart(3,'0');
-      var n2 = String(p).padStart(2,'0');
-      // Probar formato 001.jpg primero (renombrados con PowerShell)
-      return 'caps/DB/' + n3 + '.jpg';
+      return BASE + '/caps/DB/' + n3 + '.jpg';
     }
     var padCap = String(capN).padStart(3,'0');
     var padP = String(p).padStart(2,'0');
-    return 'caps/' + manga + '/cap-' + padCap + '/' + padP + '.jpg';
+    return BASE + '/caps/' + manga + '/cap-' + padCap + '/' + padP + '.jpg';
   }
 
   var totalPages = (readerManga === 'db') ? 100 : 8;
